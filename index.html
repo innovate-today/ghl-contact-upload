@@ -6,21 +6,27 @@
 <title>Upload Your File</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #0b1220;
-    --ink-soft: #475569;
+    --ink-soft: #64748b;
     --ink-faint: #94a3b8;
-    --paper: #fafaf7;
-    --line: #e2e8f0;
-    --accent: #1e40af;
-    --accent-soft: #dbeafe;
-    --ok: #065f46;
-    --ok-soft: #d1fae5;
-    --err: #991b1b;
-    --err-soft: #fee2e2;
-    --shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06);
+    --rule: #e6e8ec;
+    --rule-strong: #d4d8dd;
+    --surface: #ffffff;
+    --surface-muted: #fafafa;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --accent-ring: rgba(37, 99, 235, 0.12);
+    --ok: #047857;
+    --ok-soft: #ecfdf5;
+    --ok-rule: #a7f3d0;
+    --err: #b91c1c;
+    --err-soft: #fef2f2;
+    --err-rule: #fecaca;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.03);
   }
   * { box-sizing: border-box; }
   html, body {
@@ -28,8 +34,10 @@
     background: transparent;
     color: var(--ink);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     padding: 24px 16px;
@@ -38,81 +46,110 @@
     align-items: flex-start;
     min-height: 100vh;
   }
+
+  /* ============================================================
+   * CARD
+   * ============================================================ */
   .card {
     width: 100%;
-    max-width: 480px;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 16px;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
     padding: 32px 28px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
   }
   h1 {
     font-family: 'Fraunces', Georgia, serif;
-    font-weight: 600;
-    font-size: 26px;
+    font-weight: 500;
+    font-size: 24px;
     line-height: 1.2;
-    margin: 0 0 6px;
     letter-spacing: -0.01em;
+    margin: 0 0 4px;
+    color: var(--ink);
   }
   .sub {
     color: var(--ink-soft);
-    font-size: 14px;
-    margin: 0 0 22px;
+    font-size: 13px;
+    margin: 0 0 24px;
   }
+
+  /* ============================================================
+   * DROP ZONE  (label wraps a hidden input)
+   * ============================================================ */
   .drop {
     position: relative;
-    border: 1.5px dashed var(--line);
+    display: block;
+    border: 1.5px dashed var(--rule-strong);
     border-radius: 12px;
-    padding: 28px 20px;
+    padding: 36px 20px;
+    background: var(--surface-muted);
     text-align: center;
     cursor: pointer;
-    transition: all 0.18s ease;
-    background: white;
+    transition: border-color 0.18s ease, background 0.18s ease;
   }
-  .drop:hover, .drop.drag {
+  .drop:hover,
+  .drop.drag {
     border-color: var(--accent);
     background: var(--accent-soft);
   }
   .drop.has-file {
+    padding: 16px;
+    text-align: left;
     border-style: solid;
-    border-color: var(--accent);
-    background: white;
+    border-color: var(--rule);
+    background: var(--surface);
+    cursor: default;
   }
-  .drop input {
+  .drop input[type="file"] {
     position: absolute;
     inset: 0;
     opacity: 0;
     cursor: pointer;
   }
+  .drop.has-file input[type="file"] {
+    pointer-events: none;
+  }
+
+  /* --- empty state content --- */
+  .drop-empty {
+    display: block;
+  }
+  .drop.has-file .drop-empty { display: none; }
+
   .drop-icon {
-    width: 36px; height: 36px;
-    margin: 0 auto 10px;
+    width: 40px; height: 40px;
+    margin: 0 auto 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--ink-faint);
+    transition: color 0.18s ease;
+  }
+  .drop:hover .drop-icon,
+  .drop.drag .drop-icon {
+    color: var(--accent);
   }
   .drop-label {
     font-size: 14px;
     font-weight: 500;
     color: var(--ink);
+    margin-bottom: 2px;
   }
   .drop-hint {
     font-size: 12px;
     color: var(--ink-faint);
-    margin-top: 4px;
   }
-  .file-info {
+
+  /* --- file-selected state content --- */
+  .file-row {
     display: none;
     align-items: center;
     gap: 12px;
-    text-align: left;
-    padding: 4px 0;
   }
-  .drop.has-file .file-info { display: flex; }
-  .drop.has-file .drop-default { display: none; }
-  .file-info-icon {
+  .drop.has-file .file-row { display: flex; }
+
+  .file-icon {
     width: 36px; height: 36px;
     border-radius: 8px;
     background: var(--accent-soft);
@@ -122,93 +159,149 @@
     justify-content: center;
     flex-shrink: 0;
   }
-  .file-info-text {
+  .file-info {
     flex: 1;
     min-width: 0;
   }
-  .file-info-name {
+  .file-name {
+    font-size: 13px;
     font-weight: 500;
-    font-size: 14px;
+    color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .file-info-size {
-    font-size: 12px;
+  .file-size {
+    font-size: 11px;
     color: var(--ink-faint);
     margin-top: 2px;
   }
-  .file-info-clear {
+  .file-clear {
     background: transparent;
     border: 0;
     color: var(--ink-faint);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 6px;
+    border-radius: 6px;
     line-height: 0;
+    transition: color 0.15s, background 0.15s;
+    position: relative;
+    z-index: 2;
   }
-  .file-info-clear:hover { color: var(--err); background: var(--err-soft); }
-  button.primary {
+  .file-clear:hover {
+    color: var(--err);
+    background: var(--err-soft);
+  }
+
+  /* ============================================================
+   * BUTTON
+   * ============================================================ */
+  .btn {
     width: 100%;
-    margin-top: 18px;
-    padding: 13px 16px;
-    background: var(--ink);
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--accent);
     color: white;
     border: 0;
     border-radius: 10px;
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.01em;
-  }
-  button.primary:hover:not(:disabled) { background: #1e293b; }
-  button.primary:disabled {
-    background: var(--ink-faint);
-    cursor: not-allowed;
-  }
-  .status {
-    margin-top: 14px;
-    padding: 12px 14px;
-    border-radius: 10px;
     font-size: 14px;
-    display: none;
-    align-items: flex-start;
-    gap: 10px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
-  .status.visible { display: flex; }
-  .status.ok { background: var(--ok-soft); color: var(--ok); }
-  .status.err { background: var(--err-soft); color: var(--err); }
-  .status svg { flex-shrink: 0; margin-top: 1px; }
+  .btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+    box-shadow: 0 2px 8px var(--accent-ring);
+  }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .btn.is-success {
+    background: var(--ok);
+    box-shadow: 0 1px 2px rgba(4, 120, 87, 0.2);
+    cursor: default;
+  }
+  .btn.is-success:hover { background: var(--ok); }
+
   .spinner {
-    display: inline-block;
     width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-    margin-right: 8px;
-    vertical-align: -2px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .footer {
-    margin-top: 18px;
-    text-align: center;
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.02em;
+
+  /* ============================================================
+   * STATUS BANNER  (errors only — success is shown in the button)
+   * ============================================================ */
+  .status {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.45;
   }
-  .footer .dot { margin: 0 6px; opacity: 0.4; }
+  .status.visible { display: flex; }
+  .status.err {
+    background: var(--err-soft);
+    color: var(--err);
+    border: 1px solid var(--err-rule);
+  }
+  .status svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ============================================================
+   * FOOTER
+   * ============================================================ */
+  .footer {
+    margin-top: 20px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .footer .dot {
+    display: inline-block;
+    width: 3px; height: 3px;
+    background: var(--ink-faint);
+    border-radius: 50%;
+    margin: 0 8px;
+    vertical-align: middle;
+    opacity: 0.6;
+  }
+
+  /* ============================================================
+   * DEBUG  (only when ?debug=1)
+   * ============================================================ */
   .debug {
+    display: none;
     margin-top: 12px;
     padding: 8px 10px;
     background: #fef3c7;
     border-radius: 6px;
     font-size: 11px;
     color: #78350f;
-    font-family: ui-monospace, monospace;
-    display: none;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    word-break: break-all;
   }
   .debug.visible { display: block; }
 </style>
@@ -220,7 +313,9 @@
 
   <label class="drop" id="drop">
     <input type="file" id="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.heic" />
-    <div class="drop-default">
+
+    <!-- Empty state -->
+    <div class="drop-empty">
       <div class="drop-icon">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -231,18 +326,20 @@
       <div class="drop-label">Click to choose a file</div>
       <div class="drop-hint">PDF, Office docs, images &middot; max 25 MB</div>
     </div>
-    <div class="file-info" id="fileInfo">
-      <div class="file-info-icon">
+
+    <!-- File selected state -->
+    <div class="file-row">
+      <div class="file-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
         </svg>
       </div>
-      <div class="file-info-text">
-        <div class="file-info-name" id="fileName"></div>
-        <div class="file-info-size" id="fileSize"></div>
+      <div class="file-info">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-size" id="fileSize"></div>
       </div>
-      <button type="button" class="file-info-clear" id="clearBtn" aria-label="Remove file">
+      <button type="button" class="file-clear" id="clearBtn" aria-label="Remove file">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -251,39 +348,40 @@
     </div>
   </label>
 
-  <button class="primary" id="uploadBtn" disabled>Upload</button>
+  <button class="btn" id="uploadBtn" disabled>Upload</button>
 
   <div class="status" id="status"></div>
   <div class="debug" id="debug"></div>
 
   <div class="footer">
-    Powered by Innovate Today<span class="dot">&middot;</span>Secure upload
+    Powered by Innovate Today<span class="dot"></span>Secure Upload
   </div>
 </div>
 
 <script>
-  /* =========================================================
+  /* ============================================================
    * CONFIG
-   * ========================================================= */
+   * ============================================================ */
   const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwuvll3gv0eQFMSL4fzzYR86Y6D9l7hiea02T_gCuobiBMkmCnaD1ekSkXiAHgVc7RcdA/exec';
   const MAX_BYTES = 25 * 1024 * 1024;
-  /* ========================================================= */
 
+  /* ============================================================
+   * QUERY PARAMS + ELEMENTS
+   * ============================================================ */
   const params = new URLSearchParams(window.location.search);
-  const contactId = params.get('contact_id');
+  const contactId   = params.get('contact_id');
   const locationKey = params.get('location_key');
-  const locationId = params.get('location_id');
-  const debugMode = params.get('debug') === '1';
+  const locationId  = params.get('location_id');
+  const debugMode   = params.get('debug') === '1';
 
   const fileInput = document.getElementById('file');
-  const drop = document.getElementById('drop');
-  const fileInfo = document.getElementById('fileInfo');
-  const fileName = document.getElementById('fileName');
-  const fileSize = document.getElementById('fileSize');
-  const clearBtn = document.getElementById('clearBtn');
-  const btn = document.getElementById('uploadBtn');
-  const status = document.getElementById('status');
-  const debug = document.getElementById('debug');
+  const drop      = document.getElementById('drop');
+  const fileName  = document.getElementById('fileName');
+  const fileSize  = document.getElementById('fileSize');
+  const clearBtn  = document.getElementById('clearBtn');
+  const btn       = document.getElementById('uploadBtn');
+  const status    = document.getElementById('status');
+  const debug     = document.getElementById('debug');
 
   let selectedFile = null;
 
@@ -292,6 +390,9 @@
     debug.textContent = `contact_id=${contactId || 'MISSING'} | location_key=${locationKey || 'MISSING'} | location_id=${locationId || '(none)'}`;
   }
 
+  /* ============================================================
+   * FILE SELECTION
+   * ============================================================ */
   fileInput.addEventListener('change', e => {
     if (e.target.files[0]) setFile(e.target.files[0]);
   });
@@ -299,7 +400,7 @@
   ['dragover', 'dragenter'].forEach(evt =>
     drop.addEventListener(evt, e => {
       e.preventDefault();
-      drop.classList.add('drag');
+      if (!selectedFile) drop.classList.add('drag');
     })
   );
   ['dragleave', 'drop'].forEach(evt =>
@@ -309,23 +410,20 @@
     })
   );
   drop.addEventListener('drop', e => {
+    if (selectedFile) return;
     if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
   });
 
   clearBtn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    selectedFile = null;
-    fileInput.value = '';
-    drop.classList.remove('has-file');
-    btn.disabled = true;
-    hideStatus();
+    resetState();
   });
 
   function setFile(f) {
     hideStatus();
     if (f.size > MAX_BYTES) {
-      showStatus('File too large. Maximum size is 25 MB.', 'err');
+      showError('File too large. Maximum size is 25 MB.');
       return;
     }
     selectedFile = f;
@@ -333,6 +431,18 @@
     fileSize.textContent = formatSize(f.size);
     drop.classList.add('has-file');
     btn.disabled = false;
+    btn.textContent = 'Upload';
+    btn.classList.remove('is-success');
+  }
+
+  function resetState() {
+    selectedFile = null;
+    fileInput.value = '';
+    drop.classList.remove('has-file');
+    btn.disabled = true;
+    btn.textContent = 'Upload';
+    btn.classList.remove('is-success');
+    hideStatus();
   }
 
   function formatSize(bytes) {
@@ -341,15 +451,18 @@
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   }
 
+  /* ============================================================
+   * UPLOAD
+   * ============================================================ */
   btn.addEventListener('click', async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || btn.classList.contains('is-success')) return;
     if (!contactId || !locationKey) {
-      showStatus('Missing contact or location information. Please reload from the survey.', 'err');
+      showError('Missing contact or location information. Please reload from the original link.');
       return;
     }
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Uploading...';
+    btn.innerHTML = '<span class="spinner"></span><span>Uploading</span>';
     hideStatus();
 
     try {
@@ -363,15 +476,17 @@
       body.append('file_mime', selectedFile.type || 'application/octet-stream');
       body.append('file_data', base64);
 
-      const res = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: body
-      });
+      const res = await fetch(WEB_APP_URL, { method: 'POST', body: body });
       const result = await res.json();
 
       if (result.success) {
-        showStatus('File uploaded successfully. You can close this window.', 'ok');
-        btn.textContent = 'Uploaded \u2713';
+        btn.classList.add('is-success');
+        btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Uploaded</span>
+        `;
         try {
           window.parent?.postMessage({
             type: 'ghl_upload_complete',
@@ -383,12 +498,12 @@
         const errMsg = typeof result.error === 'string'
           ? result.error
           : (result.error?.message || 'Upload failed. Please try a different file.');
-        showStatus('Upload failed: ' + errMsg, 'err');
+        showError('Upload failed: ' + errMsg);
         btn.disabled = false;
         btn.textContent = 'Upload';
       }
     } catch (err) {
-      showStatus('Network error: ' + err.message, 'err');
+      showError('Network error: ' + err.message);
       btn.disabled = false;
       btn.textContent = 'Upload';
     }
@@ -403,11 +518,19 @@
     });
   }
 
-  function showStatus(msg, type) {
-    status.className = 'status visible ' + type;
-    status.innerHTML = type === 'ok'
-      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>${escapeHtml(msg)}</span>`
-      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${escapeHtml(msg)}</span>`;
+  /* ============================================================
+   * STATUS (errors only)
+   * ============================================================ */
+  function showError(msg) {
+    status.className = 'status visible err';
+    status.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>${escapeHtml(msg)}</span>
+    `;
   }
 
   function hideStatus() {
